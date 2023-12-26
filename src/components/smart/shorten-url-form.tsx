@@ -1,6 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 
 import BigCard from '@/components/molecules/big-card';
 import { Button } from '@/components/ui/button';
@@ -15,26 +13,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
 
-const FormSchema = z.object({
-  link: z
-    .string()
-    .regex(
-      /^(https?:\/\/)?[a-z0-9-]+(\.[a-z]{2,10})+\/[a-z0-9]/i,
-      `We'll need a valid URL, like "longasslink.com/shorten-it"`
-    )
-});
+interface FormSchema {
+  link: string;
+}
 
-type OnSubmitHandler = (
-  data: z.infer<typeof FormSchema>
-) => void | Promise<void>;
+type OnSubmitHandler = (data: FormSchema) => void | Promise<void>;
 
 export interface ShortenFormProps {
   onSubmit: OnSubmitHandler;
 }
 
+const linkRules = {
+  pattern: {
+    value: /^(https?:\/\/)?[a-z0-9-]+(\.[a-z]{2,10})+\/[a-z0-9]/i,
+    flags: 'i',
+    message: `We'll need a valid URL, like "longasslink.com/shorten-it"`
+  }
+};
 export default function ShortenForm({ onSubmit }: ShortenFormProps) {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<FormSchema>({
     defaultValues: {
       link: ''
     }
@@ -68,6 +65,7 @@ export default function ShortenForm({ onSubmit }: ShortenFormProps) {
           <FormField
             control={form.control}
             name='link'
+            rules={linkRules}
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormControl>
@@ -84,12 +82,7 @@ export default function ShortenForm({ onSubmit }: ShortenFormProps) {
               </FormItem>
             )}
           />
-          <Button
-            type='submit'
-            disabled={
-              form.formState.isSubmitting || !form.formState.isValid || busy
-            }
-          >
+          <Button type='submit' disabled={form.formState.isSubmitting || busy}>
             🦄 Shorten
           </Button>
         </form>
