@@ -1,6 +1,6 @@
 import { HamburgerMenuIcon, Link1Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
-import { Link, LinkProps, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -12,7 +12,7 @@ import { MainNavProps } from './types';
 
 export function MainNav({ navItems = [] }: MainNavProps) {
   const [open, setOpen] = useState(false);
-  const { pathname } = useLocation();
+  const [pathname] = useLocation();
 
   const processedNavItems = processNavItems(navItems, pathname);
 
@@ -52,29 +52,29 @@ export function MainNav({ navItems = [] }: MainNavProps) {
   );
 }
 
-interface MobileLinkProps extends LinkProps {
+type MobileLinkProps = React.ComponentPropsWithoutRef<typeof Link> & {
   onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
-}
+  to: string;
+};
 
 function MobileLink({
-  to,
   onOpenChange,
   className,
   children,
   ...props
 }: MobileLinkProps) {
   return (
-    <Link
-      to={to}
-      onClick={() => {
-        onOpenChange?.(false);
-      }}
-      className={cn(className)}
-      {...props}
-    >
-      {children}
+    <Link {...props}>
+      <a
+        onClick={() => {
+          onOpenChange?.(false);
+        }}
+        className={cn(className)}
+      >
+        {children}
+      </a>
     </Link>
   );
 }
