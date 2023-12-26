@@ -1,21 +1,22 @@
-import api, { ApiResponses } from '@/lib/api';
-import { useEffect } from 'react';
-import { Link, LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'wouter';
 
-export async function loader({ params }: LoaderFunctionArgs) {
-  const slug = params.slug;
-  try {
-    const response = await api
-      .get(`api/link/${slug}`)
-      .json<ApiResponses<'api/link'>>();
-    return response;
-  } catch (error) {
-    return null;
-  }
-}
+import api, { ApiResponses } from '@/lib/api';
 
 export default function ShortLinkPage() {
-  const linkData = useLoaderData() as ApiResponses<'api/link'> | null;
+  const params = useParams();
+  const [linkData, setLinkData] = useState<ApiResponses<'api/link'>>();
+
+  useEffect(() => {
+    const slug = params.slug;
+    api
+      .get(`api/link/${slug}`)
+      .json<ApiResponses<'api/link'>>()
+      .then(setLinkData)
+      .catch(() => setLinkData(undefined));
+
+    return () => setLinkData(undefined);
+  }, [params.slug]);
 
   useEffect(() => {
     let dest = '/';
@@ -32,7 +33,7 @@ export default function ShortLinkPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  });
+  }, [linkData]);
 
   if (!linkData) {
     return (

@@ -1,41 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Router } from 'wouter';
 
-import ErrorPage from './routes/error';
-import Layout from './routes/root';
-
+import Layout from '@/components/smart/layout-wrapper';
+import { SuspendedRoute } from './components/smart/suspended-route';
 import './index.css';
 
-const browserRouter = createBrowserRouter([
-  {
-    path: '/',
-    Component: Layout,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: '/',
-        async lazy() {
-          const { default: Component } = await import('./routes/home');
-          return { Component };
-        }
-      },
-      {
-        path: '/s/:slug',
-        async lazy() {
-          const { default: Component, loader } = await import(
-            './routes/shortLink'
-          );
+const NotFoundPage = React.lazy(() => import('./routes/error'));
 
-          return { Component, loader };
-        }
-      }
-    ]
-  }
-]);
+const HomePage = React.lazy(() => import('./routes/home'));
+
+const ShortLinkPage = React.lazy(() => import('./routes/shortLink'));
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={browserRouter} />
+    <Layout>
+      <Router>
+        <SuspendedRoute path='/' fallback={null}>
+          <HomePage />
+        </SuspendedRoute>
+        <SuspendedRoute path='/s/:slug' fallback={null}>
+          <ShortLinkPage />
+        </SuspendedRoute>
+        <SuspendedRoute path='*' fallback={null}>
+          <NotFoundPage />
+        </SuspendedRoute>
+      </Router>
+    </Layout>
   </React.StrictMode>
 );

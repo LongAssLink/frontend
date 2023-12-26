@@ -1,5 +1,5 @@
 import { Link1Icon } from '@radix-ui/react-icons';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 
 import { cn } from '@/lib/utils';
 
@@ -7,7 +7,7 @@ import { processNavItems } from './processNavItems';
 import { MainNavProps } from './types';
 
 export function MainNav({ navItems = [] }: MainNavProps) {
-  const { pathname } = useLocation();
+  const [pathname] = useLocation();
 
   const navItemList = processNavItems(navItems, pathname);
 

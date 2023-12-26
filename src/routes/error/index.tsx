@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 
-import Layout from '../root';
+import Layout from '@/components/smart/layout-wrapper';
+import { Link } from 'wouter';
 
 function ErrorPage() {
   useEffect(() => {
